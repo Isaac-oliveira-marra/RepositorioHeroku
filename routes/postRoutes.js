@@ -10,7 +10,7 @@ router.post('/post/:id_auth/:id_category',upload.single('foto'), async (req, res
         const { title, content } = req.body;
         const { id_auth, id_category } = req.params
         const { filename } = req.file
-        const img = `http://localhost:3001/${filename}`
+        const img = `https://api-next-mongo.herokuapp.com/${filename}`
         const response = await post.create({ title, foto: img, content, author: id_auth, category: id_category })
         res.send(response)
     } catch (error) {
