@@ -30,6 +30,9 @@ app.listen(PORT, () => {
 })
 
 //Rotas
+app.get('/', (req, res) => {
+    res.send('Bem vindo a Api')
+})
 app.use('/categories', categoryRoutes),
 app.use('/authors', authorRoutes),
 app.use('/posts', postRoutes )
