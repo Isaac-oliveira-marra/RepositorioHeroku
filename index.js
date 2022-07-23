@@ -1,22 +1,22 @@
 const express = require("express");
 const cors = require("cors");
-const starDB = require("./config/dbconfig")
+const moongose = require('mongoose');
 const categoryRoutes = require("./routes/categorieRoutes")
 const authorRoutes = require("./routes/authorRoutes")
 const postRoutes = require("./routes/postRoutes")
+require('dotenv').config()
 
 //Porta
 const PORT = process.env.PORT || 3001
 
 //conecção com mongo
-starDB()
+moongose.connect(process.env.MONGO_URL, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true
+}, () => console.log('db concectado'))
 
 //server com express
 const app = express();
-
-//Schemmas
-const author = require('./Schemmas/Author')
-const posts = require('./Schemmas/Posts');
 
 //middlewares
 app.use(cors());

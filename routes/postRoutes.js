@@ -1,17 +1,23 @@
 const Router = require('express').Router;
 const post  = require('../Schemmas/Posts')
-const multer = require("multer")
 const router = new Router()
-const multerConfig = require("../config/multer")
-const upload = multer(multerConfig)
+const upload = require("../config/multer")
+const cloudinary = require("../config/clodinary")
 
 router.post('/post/:id_auth/:id_category',upload.single('foto'), async (req, res) => {
     try {
+        const result = await cloudinary.uploader.upload(req.file.path)
         const { title, content } = req.body;
         const { id_auth, id_category } = req.params
-        const { filename } = req.file
-        const img = `https://api-next-mongo.herokuapp.com/${filename}`
-        const response = await post.create({ title, foto: img, content, author: id_auth, category: id_category })
+        const response = await post.create(
+            { 
+                title, 
+                foto: result.secure_url, 
+                cloudinary_id: result.public_id, 
+                content, author: id_auth, 
+                category: id_category 
+            }
+        )
         res.send(response)
     } catch (error) {
         res.send(error)
@@ -27,11 +33,20 @@ router.get('/get/:id', async (req, res) => {
         res.send(error)
     }
 })
-router.put('/put/:id', async (req, res) => {
+router.put('/put/:id',upload.single('foto'), async (req, res) => {
     try {
-        const  data  = req.body;
         const { id } = req.params
-        const response = await post.findByIdAndUpdate(id, data, { new: true })
+        const response = await post.findById(id)
+        await cloudinary.uploader.destroy(response.cloudinary_id)
+        const result = await cloudinary.uploader.upload(req.file.path)
+        const  data  = {
+            title: req.body.title || response.title,
+            foto: result.secure_url || response.foto,
+            content: req.body.content || response.content,
+            author: req.body.author || response.author,
+            category: req.body.category || response.category
+        }
+        response = await post.findByIdAndUpdate(id, data, { new: true })
         res.send(response)
     } catch (error) {
         res.send(error)
@@ -41,7 +56,9 @@ router.put('/put/:id', async (req, res) => {
 router.delete('/delete/:id', async (req, res) => {
     try {
         const { id } = req.params
-        const response = await post.findByIdAndDelete(id)
+        const response = await post.findById(id)
+        await cloudinary.uploader.destroy(response.cloudinary_id)
+        await response.remove()
         res.send(response)
     } catch (error) {
         res.send(error)
