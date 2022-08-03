@@ -14,7 +14,8 @@ router.post('/post/:id_auth/:id_category',upload.single('foto'), async (req, res
                 title, 
                 foto: result.secure_url, 
                 cloudinary_id: result.public_id, 
-                content, author: id_auth, 
+                content, 
+                author: id_auth, 
                 category: id_category 
             }
         )
@@ -33,6 +34,16 @@ router.get('/get/:id', async (req, res) => {
         res.send(error)
     }
 })
+
+router.get('/get', async (req, res) => {
+    try {
+        const response = await post.find()
+        res.send(response)
+    } catch (error) {
+        res.send(error)
+    }
+})
+
 router.put('/put/:id',upload.single('foto'), async (req, res) => {
     try {
         const { id } = req.params

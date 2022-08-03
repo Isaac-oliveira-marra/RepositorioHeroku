@@ -36,3 +36,4 @@ app.get('/', (req, res) => {
 app.use('/categories', categoryRoutes),
 app.use('/authors', authorRoutes),
 app.use('/posts', postRoutes )
+
